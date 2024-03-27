@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiaohe.xhapibackend.mapper.InterfaceInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.xiaohe.xhapicommon.model.entity.InterfaceInfo">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="description" column="description" jdbcType="VARCHAR"/>
+            <result property="url" column="url" jdbcType="VARCHAR"/>
+            <result property="method" column="method" jdbcType="VARCHAR"/>
+            <result property="requestParams" column="request_params" jdbcType="VARCHAR"/>
+            <result property="responseParams" column="response_params" jdbcType="VARCHAR"/>
+            <result property="requestHeader" column="request_header" jdbcType="VARCHAR"/>
+            <result property="responseHeader" column="response_header" jdbcType="VARCHAR"/>
+            <result property="resultFormat" column="result_format" jdbcType="VARCHAR"/>
+            <result property="totalInvokes" column="total_invokes" jdbcType="BIGINT"/>
+            <result property="requestExample" column="request_example" jdbcType="VARCHAR"/>
+            <result property="status" column="status" jdbcType="INTEGER"/>
+            <result property="consumePoints" column="consume_points" jdbcType="BIGINT"/>
+            <result property="userId" column="user_id" jdbcType="BIGINT"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="deleted" column="deleted" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,description,
+        url,method,request_params,
+        response_params,request_header,response_header,
+        result_format,total_invokes,request_example,
+        status,consume_points,user_id,
+        create_time,update_time,deleted
+    </sql>
+</mapper>

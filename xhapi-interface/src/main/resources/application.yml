@@ -1,0 +1,9 @@
+server:
+  port: 8123
+  servlet:
+    context-path: /api
+# API Client 测试
+xhapi:
+  client:
+    access-key: XXXXXX
+    secret-key: XXXXXX

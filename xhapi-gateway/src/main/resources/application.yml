@@ -1,0 +1,31 @@
+server:
+  port: 8090
+spring:
+  # 默认 dev 环境
+  profiles:
+    active: dev
+  cloud:
+    gateway:
+      routes:
+        - id: add_request_header_route
+          uri: http://localhost:8123
+          predicates:
+            - Path=/api/**
+          filters:
+            - AddRequestHeader=xiaohe, blue
+            - AddRequestParameter=name, blue
+            - name: CircuitBreaker
+              args:
+                name: myCircuitBreaker
+                fallbackUri: forward:/fallback
+        - id: xiaohe-fallback
+          uri: https://www.xiaohe.icu
+          predicates:
+            - Path=/fallback
+
+dubbo:
+  application:
+    name: xhapi-backend-provider
+  registry:
+    id: nacos-registry
+    address: nacos://localhost:8848
