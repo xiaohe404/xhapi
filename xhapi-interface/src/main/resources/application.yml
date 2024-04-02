@@ -5,5 +5,5 @@ server:
 # API Client 测试
 xhapi:
   client:
-    access-key: XXXXXX
-    secret-key: XXXXXX
+    access-key: 8ca2c4ecb10258e733bd6a0d0e4e2e3c
+    secret-key: 87b773511dbdb45599d3e78746e46323
