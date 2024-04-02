@@ -3,6 +3,7 @@ package com.xiaohe.xhapibackend.model.dto.interfaceInfo;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 创建请求
@@ -33,12 +34,12 @@ public class InterfaceInfoAddRequest implements Serializable {
     /**
      * 接口请求参数
      */
-    private String requestParams;
+    private List<RequestParamsField> requestParams;
 
     /**
      * 接口响应参数
      */
-    private String responseParams;
+    private List<ResponseParamsField> responseParams;
 
     /**
      * 请求头
