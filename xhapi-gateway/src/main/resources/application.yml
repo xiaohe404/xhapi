@@ -13,15 +13,7 @@ spring:
             - Path=/api/**
           filters:
             - AddRequestHeader=xiaohe, blue
-            - AddRequestParameter=name, blue
-            - name: CircuitBreaker
-              args:
-                name: myCircuitBreaker
-                fallbackUri: forward:/fallback
-        - id: xiaohe-fallback
-          uri: https://www.xiaohe.icu
-          predicates:
-            - Path=/fallback
+            - AddRequestParameter=staining, blue
 
 dubbo:
   application:
