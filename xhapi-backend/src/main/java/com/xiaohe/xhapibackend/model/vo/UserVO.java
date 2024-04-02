@@ -46,6 +46,11 @@ public class UserVO implements Serializable {
     private String accessKey;
 
     /**
+     * secretKey
+     */
+    private String secretKey;
+
+    /**
      * 用户积分,注册送30点
      */
     private Long points;

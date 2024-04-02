@@ -16,7 +16,6 @@ import com.xiaohe.xhapigateway.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.jetbrains.annotations.NotNull;
 import org.reactivestreams.Publisher;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -35,7 +34,6 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -165,6 +163,7 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
 
     /**
      * 处理响应
+     *
      * @param exchange
      * @param chain
      * @return
