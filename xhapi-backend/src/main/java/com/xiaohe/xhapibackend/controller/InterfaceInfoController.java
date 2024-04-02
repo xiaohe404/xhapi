@@ -1,8 +1,10 @@
 package com.xiaohe.xhapibackend.controller;
 
-import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import com.xiaohe.xhapibackend.annotation.AuthCheck;
 import com.xiaohe.xhapibackend.common.*;
 import com.xiaohe.xhapibackend.exception.BusinessException;
@@ -14,6 +16,8 @@ import com.xiaohe.xhapibackend.model.dto.interfaceInfo.InterfaceInfoUpdateReques
 import com.xiaohe.xhapibackend.service.InterfaceInfoService;
 import com.xiaohe.xhapibackend.service.UserService;
 import com.xiaohe.xhapiclientsdk.client.XhApiClient;
+import com.xiaohe.xhapiclientsdk.model.request.PointsRequest;
+import com.xiaohe.xhapiclientsdk.service.ApiService;
 import com.xiaohe.xhapicommon.model.entity.InterfaceInfo;
 import com.xiaohe.xhapicommon.model.entity.User;
 import com.xiaohe.xhapicommon.model.enums.InterfaceInfoStatusEnum;
@@ -24,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.xiaohe.xhapibackend.constant.UserConstant.ADMIN_ROLE;
@@ -43,7 +48,9 @@ public class InterfaceInfoController {
     private UserService userService;
 
     @Resource
-    private XhApiClient xhApiClient;
+    private ApiService apiService;
+
+    private final Gson gson = new Gson();
 
     // region 增删改查
 
@@ -220,12 +227,7 @@ public class InterfaceInfoController {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
         // 判断该接口是否可以调用
-//        com.xiaohe.xhapiclientsdk.model.User user = new com.xiaohe.xhapiclientsdk.model.User();
-//        user.setUsername("test");
-//        String username = xhApiClient.getUsernameByPost(user);
-//        if (StringUtils.isBlank(username)) {
-//            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "接口验证失败");
-//        }
+
         // 仅本人或管理员可修改
         InterfaceInfo interfaceInfo = new InterfaceInfo();
         interfaceInfo.setId(id);
@@ -276,22 +278,42 @@ public class InterfaceInfoController {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         long id = interfaceInfoInvokeRequest.getId();
-        String userRequestParams = interfaceInfoInvokeRequest.getUserRequestParams();
-        // 判断是否存在
-        InterfaceInfo oldInterfaceInfo = interfaceInfoService.getById(id);
-        if (oldInterfaceInfo == null) {
+        InterfaceInfo interfaceInfo = interfaceInfoService.getById(id);
+        if (interfaceInfo == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
-        if (oldInterfaceInfo.getStatus() == InterfaceInfoStatusEnum.OFFLINE.getValue()) {
+        if (interfaceInfo.getStatus() == InterfaceInfoStatusEnum.OFFLINE.getValue()) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "接口已关闭");
         }
+
+        // 构建请求参数
+        List<InterfaceInfoInvokeRequest.Field> fieldList = interfaceInfoInvokeRequest.getRequestParams();
+        String requestParams = "{}";
+        if (fieldList != null && fieldList.size() > 0) {
+            JsonObject jsonObject = new JsonObject();
+            for (InterfaceInfoInvokeRequest.Field field : fieldList) {
+                jsonObject.addProperty(field.getFieldName(), field.getValue());
+            }
+            requestParams = gson.toJson(jsonObject);
+        }
+        Map<String, Object> params = gson.fromJson(requestParams, new TypeToken<Map<String, Object>>() {
+        }.getType());
+
         User loginUser = userService.getLoginUser(request);
         String accessKey = loginUser.getAccessKey();
         String secretKey = loginUser.getSecretKey();
-        XhApiClient tempClient = new XhApiClient(accessKey, secretKey);
-        com.xiaohe.xhapiclientsdk.model.User user = JSONUtil.toBean(userRequestParams, com.xiaohe.xhapiclientsdk.model.User.class);
-        String usernameByPost = tempClient.getUsernameByPost(user);
-        return ResultUtils.success(usernameByPost);
+        com.xiaohe.xhapiclientsdk.model.response.BaseResponse response = null;
+        try {
+            XhApiClient xhApiClient = new XhApiClient(accessKey, secretKey);
+            PointsRequest pointsRequest = new PointsRequest();
+            pointsRequest.setMethod(interfaceInfo.getMethod());
+            pointsRequest.setPath(interfaceInfo.getUrl());
+            pointsRequest.setRequestParams(params);
+            response = apiService.request(xhApiClient, pointsRequest);
+            return ResultUtils.success(response.getData());
+        } catch (Exception e) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, e.getMessage());
+        }
     }
 
 }
