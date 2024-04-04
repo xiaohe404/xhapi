@@ -40,7 +40,7 @@ public interface UserService extends IService<User> {
      * @param request
      * @return
      */
-    User getLoginUser(HttpServletRequest request);
+    UserVO getLoginUser(HttpServletRequest request);
 
     /**
      * 获取当前登录用户（允许未登录）
@@ -48,7 +48,7 @@ public interface UserService extends IService<User> {
      * @param request
      * @return
      */
-    User getLoginUserPermitNull(HttpServletRequest request);
+    UserVO getLoginUserPermitNull(HttpServletRequest request);
 
     /**
      * 是否为管理员
@@ -64,7 +64,7 @@ public interface UserService extends IService<User> {
      * @param user
      * @return
      */
-    boolean isAdmin(User user);
+    boolean isAdmin(UserVO user);
 
     /**
      * 用户注销

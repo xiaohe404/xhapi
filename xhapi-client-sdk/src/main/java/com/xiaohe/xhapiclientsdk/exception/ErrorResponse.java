@@ -1,4 +1,4 @@
-package com.xiaohe.xhapiclientsdk.common;
+package com.xiaohe.xhapiclientsdk.exception;
 
 import lombok.Data;
 

@@ -1,5 +1,6 @@
 package com.xiaohe.xhapibackend.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -49,7 +50,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
         }
-        if (userName.length() > 40) {
+        if (StringUtils.isNotBlank(userName) && userName.length() > 40) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "昵称过长");
         }
         if (userAccount.length() < 4) {
@@ -125,8 +126,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
         }
         // 3. 记录用户的登录态
-        request.getSession().setAttribute(USER_LOGIN_STATE, user);
-        return this.getUserVO(user);
+        UserVO userVO = this.getUserVO(user);
+        request.getSession().setAttribute(USER_LOGIN_STATE, userVO);
+        return userVO;
     }
 
     /**
@@ -136,16 +138,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return
      */
     @Override
-    public User getLoginUser(HttpServletRequest request) {
+    public UserVO getLoginUser(HttpServletRequest request) {
         // 先判断是否已登录
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User currentUser = (User) userObj;
+        UserVO currentUser = BeanUtil.toBean(userObj, UserVO.class);
         if (currentUser == null || currentUser.getId() == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
         // 从数据库查询（追求性能的话可以注释，直接走缓存）
         long userId = currentUser.getId();
-        currentUser = this.getById(userId);
+        User user = this.getById(userId);
+        currentUser = this.getUserVO(user);
         if (currentUser == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
@@ -159,16 +162,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return
      */
     @Override
-    public User getLoginUserPermitNull(HttpServletRequest request) {
+    public UserVO getLoginUserPermitNull(HttpServletRequest request) {
         // 先判断是否已登录
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User currentUser = (User) userObj;
+        UserVO currentUser = BeanUtil.toBean(userObj, UserVO.class);
         if (currentUser == null || currentUser.getId() == null) {
             return null;
         }
         // 从数据库查询（追求性能的话可以注释，直接走缓存）
         long userId = currentUser.getId();
-        return this.getById(userId);
+        User user = this.getById(userId);
+        return this.getUserVO(user);
     }
 
     /**
@@ -181,12 +185,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public boolean isAdmin(HttpServletRequest request) {
         // 仅管理员可查询
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User user = (User) userObj;
-        return isAdmin(user);
+        UserVO currentUser = BeanUtil.toBean(userObj, UserVO.class);
+        return isAdmin(currentUser);
     }
 
     @Override
-    public boolean isAdmin(User user) {
+    public boolean isAdmin(UserVO user) {
         return user != null && UserRoleEnum.ADMIN.getValue().equals(user.getUserRole());
     }
 

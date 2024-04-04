@@ -132,20 +132,19 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         if (interfaceInfo == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "接口不存在");
         }
-        String requestParams = interfaceInfo.getRequestParams();
-        if (StringUtils.isBlank(requestParams)) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "接口数据异常");
-        }
         log.info("接口校验通过~");
+        String requestParams = interfaceInfo.getRequestParams();
         List<RequestParamsField> fieldList = gson.fromJson(requestParams, new TypeToken<List<RequestParamsField>>() {
         }.getType());
         MultiValueMap<String, String> queryParams = request.getQueryParams();
         log.info("请求参数：{}", queryParams);
         // 校验请求参数
-        for (RequestParamsField requestParamsField : fieldList) {
-            if ("是".equals(requestParamsField.getRequired())) {
-                if (StringUtils.isBlank(queryParams.getFirst(requestParamsField.getFieldName())) || !queryParams.containsKey(requestParamsField.getFieldName())) {
-                    throw new BusinessException(ErrorCode.FORBIDDEN_ERROR, "请求参数有误，" + requestParamsField.getFieldName() + "为必选项");
+        if (StringUtils.isNotBlank(requestParams)) {
+            for (RequestParamsField requestParamsField : fieldList) {
+                if ("是".equals(requestParamsField.getRequired())) {
+                    if (StringUtils.isBlank(queryParams.getFirst(requestParamsField.getFieldName())) || !queryParams.containsKey(requestParamsField.getFieldName())) {
+                        throw new BusinessException(ErrorCode.FORBIDDEN_ERROR, "请求参数有误，" + requestParamsField.getFieldName() + "为必选项");
+                    }
                 }
             }
         }

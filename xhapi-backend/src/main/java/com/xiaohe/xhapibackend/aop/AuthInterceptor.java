@@ -3,9 +3,9 @@ package com.xiaohe.xhapibackend.aop;
 import com.xiaohe.xhapibackend.annotation.AuthCheck;
 import com.xiaohe.xhapibackend.common.ErrorCode;
 import com.xiaohe.xhapibackend.exception.BusinessException;
-import com.xiaohe.xhapicommon.model.enums.UserRoleEnum;
 import com.xiaohe.xhapibackend.service.UserService;
-import com.xiaohe.xhapicommon.model.entity.User;
+import com.xiaohe.xhapicommon.model.enums.UserRoleEnum;
+import com.xiaohe.xhapicommon.model.vo.UserVO;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -41,7 +41,7 @@ public class AuthInterceptor {
         RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
         HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
         // 当前登录用户
-        User loginUser = userService.getLoginUser(request);
+        UserVO loginUser = userService.getLoginUser(request);
         // 必须有该权限才通过
         if (StringUtils.isNotBlank(mustRole)) {
             UserRoleEnum mustUserRoleEnum = UserRoleEnum.getEnumByValue(mustRole);

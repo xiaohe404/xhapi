@@ -1,6 +1,5 @@
 package com.xiaohe.xhapiclientsdk.exception;
 
-import com.xiaohe.xhapiclientsdk.common.ErrorCode;
 
 /**
  * 自定义异常类

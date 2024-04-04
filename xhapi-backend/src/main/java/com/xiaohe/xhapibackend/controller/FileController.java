@@ -11,6 +11,7 @@ import com.xiaohe.xhapibackend.model.dto.file.UploadFileRequest;
 import com.xiaohe.xhapibackend.model.enums.FileUploadBizEnum;
 import com.xiaohe.xhapibackend.service.UserService;
 import com.xiaohe.xhapicommon.model.entity.User;
+import com.xiaohe.xhapicommon.model.vo.UserVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,7 +57,7 @@ public class FileController {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         validFile(multipartFile, fileUploadBizEnum);
-        User loginUser = userService.getLoginUser(request);
+        UserVO loginUser = userService.getLoginUser(request);
         // 文件目录：根据业务、用户来划分
         String uuid = RandomStringUtils.randomAlphanumeric(8);
         String filename = uuid + "-" + multipartFile.getOriginalFilename();

@@ -1,6 +1,8 @@
 package com.xiaohe.xhapibackend.controller;
 
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -9,10 +11,7 @@ import com.xiaohe.xhapibackend.annotation.AuthCheck;
 import com.xiaohe.xhapibackend.common.*;
 import com.xiaohe.xhapibackend.exception.BusinessException;
 import com.xiaohe.xhapibackend.exception.ThrowUtils;
-import com.xiaohe.xhapibackend.model.dto.interfaceInfo.InterfaceInfoAddRequest;
-import com.xiaohe.xhapibackend.model.dto.interfaceInfo.InterfaceInfoInvokeRequest;
-import com.xiaohe.xhapibackend.model.dto.interfaceInfo.InterfaceInfoQueryRequest;
-import com.xiaohe.xhapibackend.model.dto.interfaceInfo.InterfaceInfoUpdateRequest;
+import com.xiaohe.xhapibackend.model.dto.interfaceInfo.*;
 import com.xiaohe.xhapibackend.service.InterfaceInfoService;
 import com.xiaohe.xhapibackend.service.UserService;
 import com.xiaohe.xhapiclientsdk.client.XhApiClient;
@@ -21,7 +20,9 @@ import com.xiaohe.xhapiclientsdk.service.ApiService;
 import com.xiaohe.xhapicommon.model.entity.InterfaceInfo;
 import com.xiaohe.xhapicommon.model.entity.User;
 import com.xiaohe.xhapicommon.model.enums.InterfaceInfoStatusEnum;
+import com.xiaohe.xhapicommon.model.vo.UserVO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -68,10 +69,20 @@ public class InterfaceInfoController {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         InterfaceInfo interfaceInfo = new InterfaceInfo();
+        if (CollectionUtils.isNotEmpty(interfaceInfoAddRequest.getRequestParams())) {
+            List<RequestParamsField> requestParamsFields = interfaceInfoAddRequest.getRequestParams().stream().filter(field -> StringUtils.isNotBlank(field.getFieldName())).collect(Collectors.toList());
+            String requestParams = JSONUtil.toJsonStr(requestParamsFields);
+            interfaceInfo.setRequestParams(requestParams);
+        }
+        if (CollectionUtils.isNotEmpty(interfaceInfoAddRequest.getResponseParams())) {
+            List<ResponseParamsField> responseParamsFields = interfaceInfoAddRequest.getResponseParams().stream().filter(field -> StringUtils.isNotBlank(field.getFieldName())).collect(Collectors.toList());
+            String responseParams = JSONUtil.toJsonStr(responseParamsFields);
+            interfaceInfo.setResponseParams(responseParams);
+        }
         BeanUtils.copyProperties(interfaceInfoAddRequest, interfaceInfo);
         // 校验
         interfaceInfoService.validInterfaceInfo(interfaceInfo, true);
-        User loginUser = userService.getLoginUser(request);
+        UserVO loginUser = userService.getLoginUser(request);
         interfaceInfo.setUserId(loginUser.getId());
         boolean result = interfaceInfoService.save(interfaceInfo);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
@@ -91,7 +102,7 @@ public class InterfaceInfoController {
         if (deleteRequest == null || deleteRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        User user = userService.getLoginUser(request);
+        UserVO user = userService.getLoginUser(request);
         long id = deleteRequest.getId();
         // 判断是否存在
         InterfaceInfo oldInterfaceInfo = interfaceInfoService.getById(id);
@@ -121,10 +132,20 @@ public class InterfaceInfoController {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         InterfaceInfo interfaceInfo = new InterfaceInfo();
+        if (CollectionUtils.isNotEmpty(interfaceInfoUpdateRequest.getRequestParams())) {
+            List<RequestParamsField> requestParamsFields = interfaceInfoUpdateRequest.getRequestParams().stream().filter(field -> StringUtils.isNotBlank(field.getFieldName())).collect(Collectors.toList());
+            String requestParams = JSONUtil.toJsonStr(requestParamsFields);
+            interfaceInfo.setRequestParams(requestParams);
+        }
+        if (CollectionUtils.isNotEmpty(interfaceInfoUpdateRequest.getResponseParams())) {
+            List<ResponseParamsField> responseParamsFields = interfaceInfoUpdateRequest.getResponseParams().stream().filter(field -> StringUtils.isNotBlank(field.getFieldName())).collect(Collectors.toList());
+            String responseParams = JSONUtil.toJsonStr(responseParamsFields);
+            interfaceInfo.setResponseParams(responseParams);
+        }
         BeanUtils.copyProperties(interfaceInfoUpdateRequest, interfaceInfo);
         // 参数校验
         interfaceInfoService.validInterfaceInfo(interfaceInfo, false);
-        User user = userService.getLoginUser(request);
+        UserVO user = userService.getLoginUser(request);
         long id = interfaceInfoUpdateRequest.getId();
         // 判断是否存在
         InterfaceInfo oldInterfaceInfo = interfaceInfoService.getById(id);
@@ -194,7 +215,7 @@ public class InterfaceInfoController {
         Page<InterfaceInfo> interfaceInfoPage = interfaceInfoService.page(new Page<>(current, size),
                 interfaceInfoService.getQueryWrapper(interfaceInfoQueryRequest));
         // 不是管理员只能查看已经上线的
-        User user = userService.getLoginUser(request);
+        UserVO user = userService.getLoginUserPermitNull(request);
         if (user == null || !user.getUserRole().equals(ADMIN_ROLE)) {
             List<InterfaceInfo> interfaceInfoList = interfaceInfoPage.getRecords().stream().filter(interfaceInfo ->
                     interfaceInfo.getStatus().equals(InterfaceInfoStatusEnum.ONLINE.getValue()))
@@ -299,7 +320,7 @@ public class InterfaceInfoController {
         Map<String, Object> params = gson.fromJson(requestParams, new TypeToken<Map<String, Object>>() {
         }.getType());
 
-        User loginUser = userService.getLoginUser(request);
+        UserVO loginUser = userService.getLoginUser(request);
         String accessKey = loginUser.getAccessKey();
         String secretKey = loginUser.getSecretKey();
         com.xiaohe.xhapiclientsdk.model.response.BaseResponse response = null;
