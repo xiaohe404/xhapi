@@ -1,14 +1,15 @@
 package com.xiaohe.xhapiclientsdk.model.params;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
 /**
- * 获取名称请求参数
+ * 随机情话请求参数
  */
 @Data
-public class NameParams implements Serializable {
+@Accessors(chain = true)
+public class LoveWordsParams implements Serializable {
     private static final long serialVersionUID = 3815188540434269370L;
-    private String name;
 }

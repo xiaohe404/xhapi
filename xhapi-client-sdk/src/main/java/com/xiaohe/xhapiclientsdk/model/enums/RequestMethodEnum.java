@@ -3,7 +3,7 @@ package com.xiaohe.xhapiclientsdk.model.enums;
 /**
  * 请求方法枚举
  */
-public enum RequestMethodEnums {
+public enum RequestMethodEnum {
 
     GET("GET", "GET"),
     POST("POST", "POST");
@@ -12,7 +12,7 @@ public enum RequestMethodEnums {
 
     private final String value;
 
-    RequestMethodEnums(String text, String value) {
+    RequestMethodEnum(String text, String value) {
         this.text = text;
         this.value = value;
     }
