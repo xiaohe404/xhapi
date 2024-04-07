@@ -107,10 +107,18 @@ public interface UserService extends IService<User> {
     void validUser(User user, boolean add);
 
     /**
-     * 更新用户积分
+     * 减少用户积分
      * @param userId
      * @param consumePoints
      * @return
      */
-    boolean updatePoints(long userId, long consumePoints);
+    boolean reducePoints(long userId, long consumePoints);
+
+    /**
+     * 增加用户积分
+     * @param userId
+     * @param consumePoints
+     * @return
+     */
+    boolean addPoints(long userId, long consumePoints);
 }

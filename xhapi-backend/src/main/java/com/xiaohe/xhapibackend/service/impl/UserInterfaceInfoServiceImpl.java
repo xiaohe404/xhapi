@@ -70,7 +70,7 @@ public class UserInterfaceInfoServiceImpl extends ServiceImpl<UserInterfaceInfoM
         // 更新接口总调用次数
         boolean updateInterfaceInfo = interfaceInfoService.updateTotalInvokes(interfaceInfoId);
         // 更新用户积分
-        boolean updateUser = userService.updatePoints(userId, consumePoints);
+        boolean updateUser = userService.reducePoints(userId, consumePoints);
         result = result && updateInterfaceInfo && updateUser;
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "调用失败");
         return true;

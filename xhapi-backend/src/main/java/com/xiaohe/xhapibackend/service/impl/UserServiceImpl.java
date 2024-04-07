@@ -289,11 +289,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public boolean updatePoints(long userId, long consumePoints) {
+    public boolean reducePoints(long userId, long consumePoints) {
         UpdateWrapper<User> userUpdateWrapper = new UpdateWrapper<>();
         userUpdateWrapper.eq("id", userId);
         userUpdateWrapper.setSql("points = points - " + consumePoints);
         return this.update(userUpdateWrapper);
     }
 
+    @Override
+    public boolean addPoints(long userId, long consumePoints) {
+        UpdateWrapper<User> userUpdateWrapper = new UpdateWrapper<>();
+        userUpdateWrapper.eq("id", userId);
+        userUpdateWrapper.setSql("points = points + " + consumePoints);
+        return this.update(userUpdateWrapper);
+    }
 }
