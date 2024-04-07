@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.xiaohe.xhapibackend.model.dto.interfaceInfo.InterfaceInfoQueryRequest;
 import com.xiaohe.xhapicommon.model.entity.InterfaceInfo;
+import com.xiaohe.xhapicommon.model.vo.UserVO;
 
 /**
 * @author Lenovo
@@ -24,7 +25,7 @@ public interface InterfaceInfoService extends IService<InterfaceInfo> {
      * @param interfaceInfoQueryRequest
      * @return
      */
-    QueryWrapper<InterfaceInfo> getQueryWrapper(InterfaceInfoQueryRequest interfaceInfoQueryRequest);
+    QueryWrapper<InterfaceInfo> getQueryWrapper(InterfaceInfoQueryRequest interfaceInfoQueryRequest, UserVO user);
 
     /**
      * 更新接口总调用次数

@@ -212,16 +212,9 @@ public class InterfaceInfoController {
         if (size > 50) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        Page<InterfaceInfo> interfaceInfoPage = interfaceInfoService.page(new Page<>(current, size),
-                interfaceInfoService.getQueryWrapper(interfaceInfoQueryRequest));
-        // 不是管理员只能查看已经上线的
         UserVO user = userService.getLoginUserPermitNull(request);
-        if (user == null || !user.getUserRole().equals(ADMIN_ROLE)) {
-            List<InterfaceInfo> interfaceInfoList = interfaceInfoPage.getRecords().stream().filter(interfaceInfo ->
-                    interfaceInfo.getStatus().equals(InterfaceInfoStatusEnum.ONLINE.getValue()))
-                    .collect(Collectors.toList());
-            interfaceInfoPage.setRecords(interfaceInfoList);
-        }
+        Page<InterfaceInfo> interfaceInfoPage = interfaceInfoService.page(new Page<>(current, size),
+                interfaceInfoService.getQueryWrapper(interfaceInfoQueryRequest, user));
         return ResultUtils.success(interfaceInfoPage);
     }
 

@@ -12,9 +12,16 @@ import com.xiaohe.xhapibackend.model.dto.interfaceInfo.InterfaceInfoQueryRequest
 import com.xiaohe.xhapibackend.service.InterfaceInfoService;
 import com.xiaohe.xhapibackend.utils.SqlUtils;
 import com.xiaohe.xhapicommon.model.entity.InterfaceInfo;
+import com.xiaohe.xhapicommon.model.enums.InterfaceInfoStatusEnum;
+import com.xiaohe.xhapicommon.model.vo.UserVO;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.xiaohe.xhapibackend.constant.UserConstant.ADMIN_ROLE;
 
 /**
 * @author Lenovo
@@ -58,7 +65,7 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
     }
 
     @Override
-    public QueryWrapper<InterfaceInfo> getQueryWrapper(InterfaceInfoQueryRequest interfaceInfoQueryRequest) {
+    public QueryWrapper<InterfaceInfo> getQueryWrapper(InterfaceInfoQueryRequest interfaceInfoQueryRequest, UserVO user) {
         if (interfaceInfoQueryRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
         }
@@ -68,6 +75,10 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         String url = interfaceInfoQueryRequest.getUrl();
         String method = interfaceInfoQueryRequest.getMethod();
         Integer status = interfaceInfoQueryRequest.getStatus();
+        // 不是管理员只能查看已经上线的
+        if (user == null || !user.getUserRole().equals(ADMIN_ROLE)) {
+            status = InterfaceInfoStatusEnum.ONLINE.getValue();
+        }
         Long consumePoints = interfaceInfoQueryRequest.getConsumePoints();
         String resultFormat = interfaceInfoQueryRequest.getResultFormat();
         String sortField = interfaceInfoQueryRequest.getSortField();
